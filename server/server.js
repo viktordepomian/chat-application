@@ -1,7 +1,7 @@
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
-const moment = require("moment"); // Add for timestamping
+const moment = require("moment-timezone"); // Updated to use moment-timezone
 
 const app = express();
 const server = http.createServer(app);
@@ -20,11 +20,12 @@ io.on("connection", (socket) => {
 
   // Listen for chat messages
   socket.on("chat message", (msg) => {
-    const time = moment().format("h:mm A");
+    // Use moment-timezone to get the current time in CEST and 24-hour format
+    const time = moment().tz("Europe/Berlin").format("HH:mm"); // CEST time in 24-hour format
     const messageData = {
       username: socket.username,
       message: msg,
-      time,
+      time, // 24-hour time in CEST
     };
     io.emit("chat message", messageData);
   });

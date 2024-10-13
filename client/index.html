@@ -62,13 +62,28 @@
     <script>
       var socket = io();
 
+      // Function to set the username and hide the modal
+      function setUsername() {
+        var username = document.getElementById("username-input").value;
+        if (username) {
+          socket.emit("set username", username);
+          document.getElementById("username-modal").style.display = "none";
+        }
+      }
+
+      // Event listener for the 'Join Chat' button
       document
         .getElementById("set-username-btn")
         .addEventListener("click", function () {
-          var username = document.getElementById("username-input").value;
-          if (username) {
-            socket.emit("set username", username);
-            document.getElementById("username-modal").style.display = "none";
+          setUsername();
+        });
+
+      // Event listener for pressing the 'Enter' key in the username input field
+      document
+        .getElementById("username-input")
+        .addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            setUsername();
           }
         });
 
