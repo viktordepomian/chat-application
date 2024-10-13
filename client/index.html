@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat App</title>
+    <link href="tailwind-output.css" rel="stylesheet" />
+    <style>
+      .system-message {
+        font-style: italic;
+        color: gray;
+      }
+      .chat-container {
+        height: 80vh;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <!-- Username Modal -->
+    <div
+      id="username-modal"
+      class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50"
+    >
+      <div class="bg-white p-6 rounded-lg">
+        <h2 class="text-2xl font-bold mb-4">Enter Your Username</h2>
+        <input
+          id="username-input"
+          class="w-full p-2 border rounded mb-4"
+          placeholder="Your Username"
+        />
+        <button
+          id="set-username-btn"
+          class="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Join Chat
+        </button>
+      </div>
+    </div>
+
+    <!-- Chat Section -->
+    <div class="max-w-2xl mx-auto py-6 px-4">
+      <div class="bg-white shadow-lg rounded-lg p-4">
+        <div class="chat-container" id="messages">
+          <ul></ul>
+        </div>
+        <form id="message-form" class="flex mt-4">
+          <input
+            id="message-input"
+            class="flex-grow p-2 border rounded-l-lg"
+            placeholder="Type a message..."
+          />
+          <button class="bg-blue-500 text-white px-4 py-2 rounded-r-lg">
+            Send
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Socket.io -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io();
+
+      document
+        .getElementById("set-username-btn")
+        .addEventListener("click", function () {
+          var username = document.getElementById("username-input").value;
+          if (username) {
+            socket.emit("set username", username);
+            document.getElementById("username-modal").style.display = "none";
+          }
+        });
+
+      // Submit message to server
+      document
+        .querySelector("#message-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          var input = document.querySelector("#message-input");
+          if (input.value) {
+            socket.emit("chat message", input.value);
+            input.value = "";
+          }
+        });
+
+      // Receive chat messages from server
+      socket.on("chat message", function (data) {
+        var li = document.createElement("li");
+        li.innerHTML = `<strong>${data.username}</strong> <span class="text-sm text-gray-500">(${data.time})</span>: ${data.message}`;
+        document.querySelector("#messages ul").appendChild(li);
+        document.querySelector(".chat-container").scrollTop =
+          document.querySelector(".chat-container").scrollHeight;
+      });
+
+      // Receive system messages (like user joins/leaves)
+      socket.on("system message", function (message) {
+        var li = document.createElement("li");
+        li.classList.add("system-message");
+        li.textContent = message;
+        document.querySelector("#messages ul").appendChild(li);
+      });
+    </script>
+  </body>
+</html>
