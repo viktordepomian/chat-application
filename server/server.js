@@ -7,13 +7,10 @@ const mongoose = require("mongoose");
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
-
+console.log("DATABASE_URL:", process.env.DATABASE_URL);
 // MongoDB connection setup
 mongoose
-  .connect(process.env.DATABASE_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.DATABASE_URL)
   .then(() => {
     console.log("MongoDB connected");
   })
