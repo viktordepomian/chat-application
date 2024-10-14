@@ -40,8 +40,37 @@
 
     <!-- Chat Section -->
     <div class="max-w-2xl mx-auto py-6 px-4">
-      <div class="bg-white shadow-lg rounded-lg p-4">
-        <div class="chat-container" id="messages">
+      <div class="bg-white shadow-lg rounded-lg p-4 relative">
+        <!-- Online Users Dropdown -->
+        <div
+          id="online-users-dropdown"
+          class="cursor-pointer p-3 bg-gray-200 rounded-md w-auto relative flex justify-between items-center"
+        >
+          <span id="online-count">0 online</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 text-gray-500"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+
+        <ul
+          id="online-users-list"
+          class="absolute bg-white shadow-lg rounded-md mt-2 w-64 hidden z-10 border border-gray-300"
+        ></ul>
+
+        <!-- Chat Window -->
+        <div
+          class="chat-container mt-4 bg-gray-50 border rounded-lg p-4"
+          id="messages"
+        >
           <ul></ul>
         </div>
         <form id="message-form" class="flex mt-4">
@@ -59,62 +88,6 @@
 
     <!-- Socket.io -->
     <script src="/socket.io/socket.io.js"></script>
-    <script>
-      var socket = io();
-
-      // Function to set the username and hide the modal
-      function setUsername() {
-        var username = document.getElementById("username-input").value;
-        if (username) {
-          socket.emit("set username", username);
-          document.getElementById("username-modal").style.display = "none";
-        }
-      }
-
-      // Event listener for the 'Join Chat' button
-      document
-        .getElementById("set-username-btn")
-        .addEventListener("click", function () {
-          setUsername();
-        });
-
-      // Event listener for pressing the 'Enter' key in the username input field
-      document
-        .getElementById("username-input")
-        .addEventListener("keydown", function (e) {
-          if (e.key === "Enter") {
-            setUsername();
-          }
-        });
-
-      // Submit message to server
-      document
-        .querySelector("#message-form")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
-          var input = document.querySelector("#message-input");
-          if (input.value) {
-            socket.emit("chat message", input.value);
-            input.value = "";
-          }
-        });
-
-      // Receive chat messages from server
-      socket.on("chat message", function (data) {
-        var li = document.createElement("li");
-        li.innerHTML = `<strong>${data.username}</strong> <span class="text-sm text-gray-500">(${data.time})</span>: ${data.message}`;
-        document.querySelector("#messages ul").appendChild(li);
-        document.querySelector(".chat-container").scrollTop =
-          document.querySelector(".chat-container").scrollHeight;
-      });
-
-      // Receive system messages (like user joins/leaves)
-      socket.on("system message", function (message) {
-        var li = document.createElement("li");
-        li.classList.add("system-message");
-        li.textContent = message;
-        document.querySelector("#messages ul").appendChild(li);
-      });
-    </script>
+    <script src="main.js"></script>
   </body>
 </html>
